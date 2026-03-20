@@ -114,28 +114,28 @@ type GetVacanciesResponse struct {
 }
 
 type GetVacanciesRequest struct {
-	Text              string   `json:"text,omitempty"`
-	SearchField       []string `json:"search_field,omitempty"`
-	Area              []string `json:"area,omitempty"`
-	ProfessionalRole  []string `json:"professional_role,omitempty"`
-	Industry          []string `json:"industry,omitempty"`
-	Experience        string   `json:"experience,omitempty"`
-	Employment        []string `json:"employment,omitempty"`
-	Schedule          []string `json:"schedule,omitempty"`
-	Salary            int      `json:"salary,omitempty"`
-	Currency          string   `json:"currency,omitempty"`
-	OnlyWithSalary    bool     `json:"only_with_salary,omitempty"`
-	Period            int      `json:"period,omitempty"`
-	DateFrom          string   `json:"date_from,omitempty"`
-	DateTo            string   `json:"date_to,omitempty"`
-	EmployerId        []string `json:"employer_id,omitempty"`
-	ExcludeEmployerId []string `json:"exclude_employer_id,omitempty"`
-	Label             []string `json:"label,omitempty"`
-	OrderBy           string   `json:"order_by,omitempty"`
-	Page              int      `json:"page,omitempty"`
-	PerPage           int      `json:"per_page,omitempty"`
-	TopLat            float64  `json:"top_lat,omitempty"`
-	BottomLat         float64  `json:"bottom_lat,omitempty"`
-	LeftLng           float64  `json:"left_lng,omitempty"`
-	RightLng          float64  `json:"right_lng,omitempty"`
+	Text              string   `json:"text,omitempty" url:"text,omitempty"`
+	SearchField       []string `json:"search_field,omitempty" url:"search_field,omitempty"`
+	Area              []string `json:"area,omitempty" url:"area,omitempty"`
+	ProfessionalRole  []string `json:"professional_role,omitempty" url:"professional_role,omitempty"`
+	Industry          []string `json:"industry,omitempty" url:"industry,omitempty"`
+	Experience        string   `json:"experience,omitempty" url:"experience,omitempty"`
+	Employment        []string `json:"employment,omitempty" url:"employment,omitempty"`
+	Schedule          []string `json:"schedule,omitempty" url:"schedule,omitempty"`
+	Salary            int      `json:"salary,omitempty" url:"salary,omitempty"`
+	Currency          string   `json:"currency,omitempty" url:"currency,omitempty"`
+	OnlyWithSalary    bool     `json:"only_with_salary,omitempty" url:"only_with_salary,omitempty"`
+	Period            int      `json:"period,omitempty" url:"period,omitempty"`
+	DateFrom          string   `json:"date_from,omitempty" url:"date_from,omitempty"`
+	DateTo            string   `json:"date_to,omitempty" url:"date_to,omitempty"`
+	EmployerId        []string `json:"employer_id,omitempty" url:"employer_id,omitempty"`
+	ExcludeEmployerId []string `json:"exclude_employer_id,omitempty" url:"exclude_employer_id,omitempty"`
+	Label             []string `json:"label,omitempty" url:"label,omitempty"`
+	OrderBy           string   `json:"order_by,omitempty" url:"order_by,omitempty"`
+	Page              int      `json:"page,omitempty" url:"page,omitempty"`
+	PerPage           int      `json:"per_page,omitempty" url:"per_page,omitempty"`
+	TopLat            float64  `json:"top_lat,omitempty" url:"top_lat,omitempty"`
+	BottomLat         float64  `json:"bottom_lat,omitempty" url:"bottom_lat,omitempty"`
+	LeftLng           float64  `json:"left_lng,omitempty" url:"left_lng,omitempty"`
+	RightLng          float64  `json:"right_lng,omitempty" url:"right_lng,omitempty"`
 }

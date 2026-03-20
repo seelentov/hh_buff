@@ -1,0 +1,11 @@
+ul.recharts-tooltip-item-list li{
+    font-size: 12px;
+}
+
+p.recharts-tooltip-label{
+    font-size: 12px;
+}
+
+.recharts-responsive-container tspan{
+    font-size: 12px;
+}

@@ -1,29 +1,29 @@
 import './App.css'
 import {useEffect, useState} from "react";
-import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import Chart from "./components/Chart.tsx";
+import type {IDBSnaphot} from "./core/types/db_snapshot.ts";
+import Select, {type MultiValue} from 'react-select';
+import DatePicker from "react-datepicker";
 
-interface IQuery {
-    text: string;
+interface IOption {
+    value: string;
+    label: string;
 }
 
-interface IDBQuery {
-    id: number;
-    created_at: string;
-    name: string;
-    query: IQuery
-}
-
-interface IDBSnaphot {
-    id: number;
-    created_at: string;
-    count: number;
-    query_id: number;
-    query: IDBQuery
-}
+const options: IOption[] = [
+    {value: 'chocolate', label: 'Chocolate'},
+    {value: 'strawberry', label: 'Strawberry'},
+    {value: 'vanilla', label: 'Vanilla'},
+];
 
 function App() {
     const [data, setData] = useState<IDBSnaphot[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const [selectedQueries, setSelectedQueries] = useState<IOption[]>([]);
+
+    const [startDate, setStartDate] = useState<Date | null>(new Date());
+    const [endDate, setEndDate] = useState<Date | null>(new Date());
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,7 +33,6 @@ function App() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
-                // console.log(result);
                 setData(result);
             } catch (err) {
                 console.error(err);
@@ -45,60 +44,55 @@ function App() {
         fetchData();
     }, []);
 
-    const prepareChartData = () => {
-        const groups: Record<string, any> = {};
-
-        data.forEach(item => {
-            const time = new Date(item.created_at).toLocaleTimeString(); // Время для оси X
-            if (!groups[time]) {
-                groups[time] = {time};
-            }
-            const lineName = item.query.name || `Query ${item.query_id}`;
-            groups[time][lineName] = item.count;
-        });
-
-        return Object.values(groups).sort((a, b) =>
-            new Date(a.time).getTime() - new Date(b.time).getTime()
-        );
+    const handleChange = (newValue: MultiValue<IOption>) => {
+        setSelectedQueries(newValue as IOption[]);
     };
 
-    const chartData = prepareChartData();
-
-    const queryNames = Array.from(new Set(data.map(item => item.query.name || `Query ${item.query_id}`)));
-    const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
-
     return (
-        <main style={{width: '100%', height: 400}}>
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData}>
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                        />
-                        <XAxis
-                            dataKey="time"
-                        />
-                        <YAxis
-                            domain={[0, 'dataMax']}
-                            tickFormatter={(val) => val.toLocaleString()}
-                        />
-                        <Tooltip/>
-                        <Legend/>
-                        {queryNames.map((name, index) => (
-                            <Line
-                                key={name}
-                                type="monotone"
-                                dataKey={name}
-                                stroke={colors[index % colors.length]}
-                                dot={false}
+        <div className="wrapper">
+            <main>
+                <section id="chart">
+                    <div className="container-v">
+                        <Chart data={data} isLoading={isLoading}/>
+                    </div>
+                    <div className="container container-v flex gap">
+                        <div style={{width: '100%'}}>
+                            <Select
+                                options={options}
+                                isMulti
+                                value={selectedQueries}
+                                onChange={handleChange}
+                                isSearchable
                             />
-                        ))}
-                    </LineChart>
-                </ResponsiveContainer>
-            )}
-        </main>
+                        </div>
+                        <DatePicker
+                            selected={startDate}
+                            onChange={(date: Date | null) => setStartDate(date)}
+                            locale="ru"
+                            dateFormat="dd.MM.yyyy"
+                            className="form-control"
+                            placeholderText="Нажмите, чтобы выбрать"
+                            isClearable
+                            showPopperArrow={false} // Убираем стрелочку сверху для минимализма
+                        />
+                        <DatePicker
+                            selected={endDate}
+                            onChange={(date: Date | null) => setEndDate(date)}
+                            locale="ru"
+                            dateFormat="dd.MM.yyyy"
+                            className="form-control"
+                            placeholderText="Нажмите, чтобы выбрать"
+                            isClearable
+                            showPopperArrow={false}
+                        />
+                    </div>
+                    <div className="container">
+                        <button type="button" className="btn btn-primary">Обновить график</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+
     );
 }
 
