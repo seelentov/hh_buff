@@ -36,7 +36,7 @@ func TestDBQueryRepo_SaveAndGet(t *testing.T) {
 		},
 	}
 
-	if err := r.Save(newQuery); err != nil {
+	if _, err := r.Save(newQuery); err != nil {
 		t.Errorf("Save() error: %v", err)
 	}
 
@@ -57,7 +57,7 @@ func TestDBQueryRepo_SaveAndGet(t *testing.T) {
 func TestDBQueryRepo_GetByText(t *testing.T) {
 	_, r := setupTestDB(t)
 
-	r.Save(&models.DBQuery{Name: "Python Developer"})
+	r.Save(&models.DBQuery{Name: "Python Developer", Query: hh.GetVacanciesRequest{Text: "Python Developer"}})
 
 	t.Run("Exists", func(t *testing.T) {
 		res, err := r.GetByText("Python Developer")
@@ -74,11 +74,11 @@ func TestDBQueryRepo_GetByText(t *testing.T) {
 func TestDBQueryRepo_GetAll(t *testing.T) {
 	_, r := setupTestDB(t)
 
-	err := r.Save(&models.DBQuery{Name: "Q1"})
+	_, err := r.Save(&models.DBQuery{Name: "Q1", Query: hh.GetVacanciesRequest{Text: "Q1"}})
 	if err != nil {
 		t.Errorf("Save() error: %v", err)
 	}
-	err = r.Save(&models.DBQuery{Name: "Q2"})
+	_, err = r.Save(&models.DBQuery{Name: "Q2", Query: hh.GetVacanciesRequest{Text: "Q2"}})
 	if err != nil {
 		t.Errorf("Save() error: %v", err)
 	}
@@ -96,7 +96,7 @@ func TestDBQueryRepo_GetAll(t *testing.T) {
 func TestDBQueryRepo_Delete(t *testing.T) {
 	_, r := setupTestDB(t)
 
-	q := &models.DBQuery{Name: "DeleteMe"}
+	q := &models.DBQuery{Name: "DeleteMe", Query: hh.GetVacanciesRequest{Text: "DeleteMe"}}
 	r.Save(q)
 
 	if err := r.Delete(q.ID); err != nil {

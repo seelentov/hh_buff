@@ -65,6 +65,7 @@ func main() {
 
 	r.GET("/rest/data", ctrl.Data)
 	r.GET("/rest/current", ctrl.Current)
+	r.GET("/rest/queries", ctrl.Queries)
 
 	restPort := os.Getenv("REST_PORT")
 	if err := r.Run(":" + restPort); err != nil {

@@ -87,6 +87,7 @@ func (d *SnapshotCreatorDaemon) processIteration() {
 			log.Printf("Error saving snapshot for query %s: %v", query.Name, err)
 		}
 
+		log.Printf("Snapshot created: %s :%v", query.Name, count)
 		time.Sleep(d.period)
 	}
 

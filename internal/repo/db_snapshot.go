@@ -2,6 +2,7 @@ package repo
 
 import (
 	"hh_buff/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -40,4 +41,25 @@ func (r *DBSnapshotRepo) GetCurrentCount(queryID uint) (int, error) {
 	}
 
 	return snapshot.Count, nil
+}
+
+func (r *DBSnapshotRepo) GetByQueryIDsAndDate(queryID []uint, startDate *time.Time, endDate *time.Time) ([]*models.DBSnapshot, error) {
+	var snapshots []*models.DBSnapshot
+
+	db := r.db.Preload("Query")
+
+	if len(queryID) > 0 {
+		db = db.Where("query_id IN (?)", queryID)
+	}
+
+	if startDate != nil && endDate != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", *startDate, *endDate)
+	} else if startDate != nil {
+		db = db.Where("created_at >= ?", *startDate)
+	} else if endDate != nil {
+		db = db.Where("created_at <= ?", *endDate)
+	}
+
+	err := db.Find(&snapshots).Error
+	return snapshots, err
 }

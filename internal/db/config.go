@@ -4,7 +4,6 @@ import (
 	"hh_buff/internal/models"
 
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var entities = []interface{}{
@@ -13,5 +12,5 @@ var entities = []interface{}{
 }
 
 var config = &gorm.Config{
-	Logger: logger.Default.LogMode(logger.Info),
+	// Logger: logger.Default.LogMode(logger.Info),
 }

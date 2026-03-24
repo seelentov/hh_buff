@@ -2,6 +2,7 @@ package repo_test
 
 import (
 	db "hh_buff/internal/db"
+	"hh_buff/pkg/hh"
 	"testing"
 
 	"hh_buff/internal/models"
@@ -27,7 +28,7 @@ func setupSnapshotTestDB(t *testing.T) (*gorm.DB, *repo.DBSnapshotRepo, *repo.DB
 func TestDBSnapshotRepo_Save(t *testing.T) {
 	_, r, qRepo := setupSnapshotTestDB(t)
 
-	query := &models.DBQuery{Name: "Go Test"}
+	query := &models.DBQuery{Name: "Go Test", Query: hh.GetVacanciesRequest{Text: "Go Test"}}
 	qRepo.Save(query)
 
 	snapshot := &models.DBSnapshot{
@@ -47,8 +48,8 @@ func TestDBSnapshotRepo_Save(t *testing.T) {
 func TestDBSnapshotRepo_GetAllByQuery(t *testing.T) {
 	_, r, qRepo := setupSnapshotTestDB(t)
 
-	q1 := &models.DBQuery{Name: "Query 1"}
-	q2 := &models.DBQuery{Name: "Query 2"}
+	q1 := &models.DBQuery{Name: "Query 1", Query: hh.GetVacanciesRequest{Text: "Query 1"}}
+	q2 := &models.DBQuery{Name: "Query 2", Query: hh.GetVacanciesRequest{Text: "Query 2"}}
 	qRepo.Save(q1)
 	qRepo.Save(q2)
 
