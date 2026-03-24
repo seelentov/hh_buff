@@ -36,7 +36,7 @@ func TestDBQueryRepo_SaveAndGet(t *testing.T) {
 		},
 	}
 
-	if _, err := r.Save(newQuery); err != nil {
+	if err := r.Save(newQuery); err != nil {
 		t.Errorf("Save() error: %v", err)
 	}
 
@@ -73,12 +73,11 @@ func TestDBQueryRepo_GetByText(t *testing.T) {
 
 func TestDBQueryRepo_GetAll(t *testing.T) {
 	_, r := setupTestDB(t)
-
-	_, err := r.Save(&models.DBQuery{Name: "Q1", Query: hh.GetVacanciesRequest{Text: "Q1"}})
+	err := r.Save(&models.DBQuery{Name: "Q1", Query: hh.GetVacanciesRequest{Text: "Q1"}})
 	if err != nil {
 		t.Errorf("Save() error: %v", err)
 	}
-	_, err = r.Save(&models.DBQuery{Name: "Q2", Query: hh.GetVacanciesRequest{Text: "Q2"}})
+	err = r.Save(&models.DBQuery{Name: "Q2", Query: hh.GetVacanciesRequest{Text: "Q2"}})
 	if err != nil {
 		t.Errorf("Save() error: %v", err)
 	}

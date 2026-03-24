@@ -17,7 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var restCurrentPath = "/rest/current"
 var restDataPath = "/rest/data"
 var restQueriesPath = "/rest/queries"
 var restUploadPath = "/rest/upload"
@@ -84,42 +83,18 @@ func setupTestRestController(t *testing.T) *gin.Engine {
 
 	qr := repo.NewDBQueryRepo(d)
 	sr := repo.NewDBSnapshotRepo(d)
-	rc := htp.NewRestController(qr, sr)
+	hc := hh.NewClient()
+	rc := htp.NewRestController(qr, sr, hc)
 
 	gin.SetMode(gin.TestMode)
 
 	router := gin.Default()
-	router.GET(restCurrentPath, rc.Current)
 	router.GET(restDataPath, rc.Data)
 	router.GET(restQueriesPath, rc.Queries)
 	router.POST(restUploadPath, rc.UploadQuery)
 
 	restController = router
 	return restController
-}
-
-func TestRestControllerCurrent(t *testing.T) {
-	router := setupTestRestController(t)
-
-	req, _ := http.NewRequest(http.MethodGet, restCurrentPath, nil)
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-
-	router.ServeHTTP(w, req)
-
-	var ens map[string]int
-	if err := json.Unmarshal(w.Body.Bytes(), &ens); err != nil {
-		t.Fatal(err)
-	}
-
-	if ens["Go"] != 150.0 {
-		t.Errorf("Go got: %v, want: %v", ens["Go"], 150)
-	}
-
-	if ens["Java"] != 50 {
-		t.Errorf("Java got: %v, want: %v", ens["Java"], 50)
-	}
 }
 
 func TestRestControllerData(t *testing.T) {
@@ -261,5 +236,39 @@ func TestRestControllerUploadQueryInvalid(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("Expected status 400 for invalid payload, got %d", w.Code)
+	}
+}
+
+func TestRestControllerUploadQueryExists(t *testing.T) {
+	router := setupTestRestController(t)
+
+	uploadReq := htp.UploadQueryReq{
+		Name: "Go",
+		Query: hh.GetVacanciesRequest{
+			Text: "Go",
+			Area: []string{"1", "2"},
+		},
+	}
+
+	body, _ := json.Marshal(uploadReq)
+	req, _ := http.NewRequest(http.MethodPost, restUploadPath, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d. Body: %s", w.Code, w.Body.String())
+	}
+
+	body, _ = json.Marshal(uploadReq)
+	req, _ = http.NewRequest(http.MethodPost, restUploadPath, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusConflict {
+		t.Errorf("Expected status 409, got %d. Body: %s", w.Code, w.Body.String())
 	}
 }

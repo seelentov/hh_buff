@@ -52,12 +52,12 @@ func (r *DBSnapshotRepo) GetByQueryIDsAndDate(queryID []uint, startDate *time.Ti
 		db = db.Where("query_id IN (?)", queryID)
 	}
 
-	if startDate != nil && endDate != nil {
-		db = db.Where("created_at BETWEEN ? AND ?", *startDate, *endDate)
-	} else if startDate != nil {
+	if startDate != nil {
 		db = db.Where("created_at >= ?", *startDate)
-	} else if endDate != nil {
-		db = db.Where("created_at <= ?", *endDate)
+	}
+
+	if endDate != nil {
+		db = db.Where("created_at <= ?", (*endDate).Add(time.Hour*24))
 	}
 
 	err := db.Find(&snapshots).Error

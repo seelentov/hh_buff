@@ -1,17 +1,26 @@
 package main
 
 import (
+	_ "hh_buff/docs"
 	"hh_buff/internal/db"
 	htt "hh_buff/internal/http"
 	"hh_buff/internal/repo"
+	"hh_buff/pkg/hh"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
+
+// @title           HH Buff API
+// @version         1.0
+// @description     Сервис для мониторинга вакансий hh.ru.
+// @BasePath        /rest
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -50,10 +59,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	hhClient := hh.NewClient()
+
 	queryRepo := repo.NewDBQueryRepo(database)
 	snapshotRepo := repo.NewDBSnapshotRepo(database)
 
-	ctrl := htt.NewRestController(queryRepo, snapshotRepo)
+	ctrl := htt.NewRestController(queryRepo, snapshotRepo, hhClient)
 
 	r := gin.Default()
 
@@ -64,8 +75,10 @@ func main() {
 	})
 
 	r.GET("/rest/data", ctrl.Data)
-	r.GET("/rest/current", ctrl.Current)
 	r.GET("/rest/queries", ctrl.Queries)
+	r.POST("/rest/queries", ctrl.UploadQuery)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	restPort := os.Getenv("REST_PORT")
 	if err := r.Run(":" + restPort); err != nil {

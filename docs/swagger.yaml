@@ -1,0 +1,217 @@
+basePath: /rest
+definitions:
+  hh_buff_internal_models.DBQuery:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      query:
+        $ref: '#/definitions/hh_buff_pkg_hh.GetVacanciesRequest'
+      snapshots:
+        items:
+          $ref: '#/definitions/hh_buff_internal_models.DBSnapshot'
+        type: array
+    type: object
+  hh_buff_internal_models.DBSnapshot:
+    properties:
+      count:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      query:
+        $ref: '#/definitions/hh_buff_internal_models.DBQuery'
+      query_id:
+        type: integer
+    type: object
+  hh_buff_pkg_hh.GetVacanciesRequest:
+    properties:
+      area:
+        items:
+          type: string
+        type: array
+      bottom_lat:
+        type: number
+      currency:
+        type: string
+      date_from:
+        type: string
+      date_to:
+        type: string
+      employer_id:
+        items:
+          type: string
+        type: array
+      employment:
+        items:
+          type: string
+        type: array
+      exclude_employer_id:
+        items:
+          type: string
+        type: array
+      experience:
+        type: string
+      industry:
+        items:
+          type: string
+        type: array
+      label:
+        items:
+          type: string
+        type: array
+      left_lng:
+        type: number
+      only_with_salary:
+        type: boolean
+      order_by:
+        type: string
+      page:
+        type: integer
+      per_page:
+        type: integer
+      period:
+        type: integer
+      professional_role:
+        items:
+          type: string
+        type: array
+      right_lng:
+        type: number
+      salary:
+        type: integer
+      schedule:
+        items:
+          type: string
+        type: array
+      search_field:
+        items:
+          type: string
+        type: array
+      text:
+        type: string
+      top_lat:
+        type: number
+    type: object
+  internal_http.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  internal_http.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  internal_http.UploadQueryReq:
+    properties:
+      name:
+        type: string
+      query:
+        $ref: '#/definitions/hh_buff_pkg_hh.GetVacanciesRequest'
+    required:
+    - name
+    - query
+    type: object
+info:
+  contact: {}
+  description: Сервис для мониторинга вакансий hh.ru.
+  title: HH Buff API
+  version: "1.0"
+paths:
+  /data:
+    get:
+      description: Возвращает срезы данных по ID запросов и диапазону дат
+      parameters:
+      - description: Дата начала (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: Дата конца (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - collectionFormat: multi
+        description: Список ID запросов
+        in: query
+        items:
+          type: integer
+        name: queries
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/hh_buff_internal_models.DBSnapshot'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+      summary: Получить исторические данные
+      tags:
+      - data
+  /queries:
+    get:
+      description: Возвращает список запросов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/hh_buff_internal_models.DBQuery'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+      summary: Получить список запросов
+      tags:
+      - queries
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_http.UploadQueryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_http.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http.ErrorResponse'
+      summary: Создать новый запрос
+      tags:
+      - queries
+swagger: "2.0"

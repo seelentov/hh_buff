@@ -3,6 +3,7 @@ package repo
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"hh_buff/internal/models"
 	"strings"
 
@@ -35,31 +36,33 @@ func (r *DBQueryRepo) GetAll() ([]*models.DBQuery, error) {
 	return query, r.db.Find(&query).Error
 }
 
-func (r *DBQueryRepo) Save(query *models.DBQuery) (bool, error) {
+func (r *DBQueryRepo) Save(query *models.DBQuery) error {
 	if query == nil || strings.TrimSpace(query.Query.Text) == "" {
-		return false, ErrInvalidQuery
+		return ErrInvalidQuery
 	}
 
 	queryBytes, err := json.Marshal(query.Query)
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	err = r.db.Where("query = ?", string(queryBytes)).First(&models.DBQuery{}).Error
+	exists := models.DBQuery{}
+
+	err = r.db.Where("query = ?", string(queryBytes)).First(&exists).Error
 
 	if err == nil {
-		return false, ErrAlreadyExists
+		return fmt.Errorf("%w: %s", ErrAlreadyExists, exists.Name)
 	}
 
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, err
+		return err
 	}
 
 	if err := r.db.Create(query).Error; err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
 func (r *DBQueryRepo) Delete(id uint) error {
